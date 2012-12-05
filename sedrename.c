@@ -14,6 +14,7 @@
 */
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "config.h"
 #include "global.h"
@@ -101,19 +102,27 @@ sedrename (int argc, char **argv, Coord x, Coord y)
 
   ELEMENT_LOOP (PCB->Data);
   {
-    char *new_ref;
+    char new_ref[100];
 
     if (!TEST_FLAG (SELECTEDFLAG, element))
       continue;
 
-    if (fscanf (fp, "%as", &new_ref) != EOF) {
-      printf ("Send '%s', got '%s'\n", element->Name[1].TextString, new_ref);
+    if (fgets(new_ref, 100, fp) == NULL) {
+      printf ("Error: %d\n", errno);
+    } else {
+      new_ref[strlen(new_ref)-1] = 0; // Kill newline
+      printf ("Sent '%s', got '%s'\n", element->Name[1].TextString, new_ref);
 
       AddObjectToChangeNameUndoList (ELEMENT_TYPE, NULL, NULL,
                                      element,
                                      NAMEONPCB_NAME (element));
 
-      ChangeObjectName (ELEMENT_TYPE, element, NULL, NULL, new_ref);
+      char *new = strdup(new_ref);
+      if (new == NULL) {
+        printf ("Couldn't allocate new element name: %d\n", errno);
+        break;
+      }
+      ChangeObjectName (ELEMENT_TYPE, element, NULL, NULL, new);
     }
   }
   END_LOOP;
