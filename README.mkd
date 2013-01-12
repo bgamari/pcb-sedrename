@@ -1,0 +1,19 @@
+# pcb-sedrename
+
+This is a plugin for [gEDA]() [pcb]() for renaming a selection of components
+with a regular expression.
+
+## Installation
+
+ 1. Build `pcb` from source
+ 2. Set `PCB_DIR` in `Makefile` to point to your `pcb` source 
+ 3. Run `make`
+ 4. Run `make install` to install in `~/.pcb/plugins`
+
+## Usage
+
+With an active selection in `pcb`, enter command mode (press `:`), enter
+`sedrename` and press enter. You will be prompted for a regular expression in
+typical `sed` substitution (`s/EXP/EXP/`) syntax. The selected components will
+be renamed according to this expression.
+
